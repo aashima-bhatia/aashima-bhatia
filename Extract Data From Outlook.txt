@@ -1,0 +1,106 @@
+Option Explicit
+Sub GetDataFinal()
+Dim OutlookApp As outlook.Application
+Dim OutlookNamespace As Namespace
+Dim Folder As MAPIFolder
+Dim oRecip As Object 'Outlook.Recipient
+Dim outlookmail As Variant
+Dim outlook As Variant
+Dim outlookAtch As Object
+Dim i As Integer
+Dim col As Long
+Dim DirAtt As Variant
+Set OutlookApp = New outlook.Application
+Set OutlookNamespace = OutlookApp.GetNamespace("MAPI")
+Set Folder = OutlookNamespace.PickFolder
+
+
+col = 0
+i = 1
+
+Dim rngName As Name
+Sheet3.Cells.Clear
+For Each rngName In ActiveWorkbook.Names
+rngName.Delete
+Next
+On Error Resume Next
+Range("A4").Name = "email_Date"
+Range("A4") = "Date"
+Range("B4").Name = "email_Subject"
+Range("B4") = "Subject"
+Range("C4").Name = "email_SenderName"
+Range("C4") = "Sender Name"
+Range("D4").Name = "email_SenderAddress"
+Range("D4") = "Sender Address"
+Range("E4").Name = "email_SentOnBehalfOfName"
+Range("E4") = "Sent On Behalf Of Name"
+Range("F4").Name = "email_ReceiverAddress"
+Range("F4") = "Receiver Address"
+Range("G4").Name = "email_CC"
+Range("G4") = "CC"
+Range("H4").Name = "email_BCC"
+Range("H4") = "BCC"
+Range("I4").Name = "email_Body"
+Range("I4") = "Body"
+Range("J4").Name = "email_Attachment"
+Range("J4") = "Attachment 1"
+Range("K4").Name = "email_Attachment2"
+Range("K4") = "Attachment 2"
+Range("L4").Name = "email_Attachment3"
+Range("A2").Name = "start"
+Range("A2") = "Start Date"
+Range("C2").Name = "end"
+Range("C2") = "End Date"
+Range("B2").Name = "email_Start_Date"
+Range("email_Start_Date").Value = InputBox("Enter Start Date like 20-mar-2021")
+Range("D2").Name = "email_End_Date"
+Range("email_End_Date").Value = InputBox("Enter End Date like 20-june-2021 And Add One More Date")
+Range("E2").Name = "foldername"
+Range("E2") = "Folder Path"
+Range("F2").Name = "folder"
+Range("folder").Value = Folder.FolderPath
+For Each outlookmail In Folder.Items
+'If outlookmail.Attachments.Count > 0 Then
+For Each outlookAtch In outlookmail.Attachments
+If Not outlookAtch.Filename Like "image*.*" Then
+If Dir(DirAtt & outlookAtch.Filename, vbDirectory) = "" Then
+If outlookmail.ReceivedTime >= Range("email_Start_Date").Value And outlookmail.ReceivedTime <= Range("email_End_Date").Value Then
+Range("email_Date").Offset(i, 0).Value = outlookmail.ReceivedTime
+Range("email_Subject").Offset(i, 0).Value = outlookmail.Subject
+Range("email_SenderName").Offset(i, 0).Value = outlookmail.SenderName
+Range("email_SenderAddress").Offset(i, 0).Value = outlookmail.SenderEmailAddress
+Range("email_SentOnBehalfOfName").Offset(i, 0).Value = outlookmail.SentOnBehalfOfName
+Range("email_ReceiverAddress").Offset(i, 0).Value = outlookmail.To
+Range("email_CC").Offset(i, 0).Value = outlookmail.CC
+Range("email_BCC").Offset(i, 0).Value = outlookmail.BCC
+Range("email_Body").Offset(i, 0).Value = outlookmail.Body
+Range("email_Attachment").Offset(i, col).Value = outlookAtch.Filename
+col = col + 1
+End If
+End If
+End If
+Next outlookAtch
+col = 0
+i = i + 1
+'End If
+Next outlookmail
+
+    
+For Each outlook In Folder.Items
+If outlook.ReceivedTime >= Range("email_Start_Date").Value And outlook.ReceivedTime <= Range("email_End_Date").Value Then
+Range("email_Date").Offset(i, 0).Value = outlook.ReceivedTime
+Range("email_Subject").Offset(i, 0).Value = outlook.Subject
+Range("email_SenderName").Offset(i, 0).Value = outlook.SenderName
+Range("email_SenderAddress").Offset(i, 0).Value = outlook.SenderEmailAddress
+Range("email_SentOnBehalfOfName").Offset(i, 0).Value = outlook.SentOnBehalfOfName
+Range("email_ReceiverAddress").Offset(i, 0).Value = outlook.To
+Range("email_CC").Offset(i, 0).Value = outlook.CC
+Range("email_BCC").Offset(i, 0).Value = outlook.BCC
+Range("email_Body").Offset(i, 0).Value = outlook.Body
+i = i + 1
+End If
+Next outlook
+Set Folder = Nothing
+Set OutlookNamespace = Nothing
+Set OutlookApp = Nothing
+End Sub
