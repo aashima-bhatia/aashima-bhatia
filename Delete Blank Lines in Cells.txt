@@ -1,0 +1,17 @@
+
+Sub DeleteBlankLines()
+Dim xRng As Range, xcell As Range
+Dim i As Integer
+On Error Resume Next
+Set xRng = Application.InputBox("Please select range:", "Remove Space", Selection.Address, , , , , 8)
+If xRng Is Nothing Then Exit Sub
+On Error Resume Next
+For Each xcell In xRng
+  For i = 1 To Len(xcell) - Len(WorksheetFunction.Substitute(xcell, Chr(10), ""))
+   xcell = Replace(xcell, Chr(10) + Chr(10), Chr(10))
+  Next
+Next
+End Sub
+
+
+
