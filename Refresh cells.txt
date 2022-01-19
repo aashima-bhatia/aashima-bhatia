@@ -1,0 +1,11 @@
+Sub RefreshCells()
+Dim r As Range, rr As Range
+Set rr = Selection
+For Each r In rr
+    r.Select
+    Application.SendKeys "{F2}"
+    Application.SendKeys "{ENTER}"
+    DoEvents
+Next
+End Sub
+    
