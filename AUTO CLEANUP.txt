@@ -1,0 +1,163 @@
+DATA CLEAN UP EXCEL
+
+
+import os
+import pandas as pd
+import xlrd
+
+path="D:\IO"
+
+for x in os.listdir(path):
+    if x.endswith(".xlsx"):
+        print(x)
+        f=pd.read_excel(rf"D:\IO\{x}")
+        
+        
+        
+        
+       
+        f.columns = f.columns.str.replace(' ','_')
+        to_drop=['Product','Is_Parent','Tags','Condition','Per_Unit_COGS','Inventory_Tied_Cost']
+        f.drop(to_drop, inplace=True, axis=1)
+        to_drop=['Per_Unit_Price','Total_Retail_Value','Estimated_Profit_Per_Unit','Total_Cash_Value']
+        f.drop(to_drop, inplace=True, axis=1)
+        to_drop=['Age_Level','Recommended_Reorder_Date','Reorder_Quantity','Capital_Required']
+        f.drop(to_drop,inplace=True,axis=1)
+        to_drop=['ROI','Margin','Restock_Lead_Time','Safety_Days','Days_of_Cover','Crate_Quantity']
+        f.drop(to_drop,inplace=True,axis=1)
+        to_drop=['Crate_Behavior','Expiry_Date','Back_In_Stock_Date', 'Upto_90_Days', '91_to_180_Days',
+                 '181_to_270_Days', '271_to_365_Days', 'More_than_365_Days',
+                 'For_Customer_Orders', 'For_FC_Transfers', 'For_FC_Processing']
+        f.drop(to_drop,inplace=True,axis=1)
+        to_drop=['Title']
+        f.drop(to_drop,inplace=True,axis=1)
+
+
+
+        f.set_index('Account_Title', inplace = True)
+        f.head()
+
+        f.to_excel('ISO_jan_18.xlsx')
+        f.to_excel('ISO_feb_18.xlsx')
+        f.to_excel('ISO_mar_18.xlsx')
+        f.to_excel('ISO_apr_18.xlsx')
+        f.to_excel('ISO_may_18.xlsx')
+        f.to_excel('ISO_jun_18.xlsx')    
+        f.to_excel('ISO_jul_18.xlsx')
+        f.to_excel('ISO_aug_18.xlsx')
+        f.to_excel('ISO_sep_18.xlsx')
+        f.to_excel('ISO_oct_18.xlsx')
+        f.to_excel('ISO_nov_18.xlsx')
+        f.to_excel('ISO_dec_18.xlsx')
+        f.to_excel('ISO_jan_19.xlsx')
+        f.to_excel('ISO_feb_19.xlsx')
+        f.to_excel('ISO_mar_19.xlsx')
+        f.to_excel('ISO_apr_19.xlsx')
+        f.to_excel('ISO_may_19.xlsx')
+        f.to_excel('ISO_jun_19.xlsx')
+        f.to_excel('ISO_jul_19.xlsx')
+        f.to_excel('ISO_aug_19.xlsx')
+        f.to_excel('ISO_sep_19.xlsx')
+        f.to_excel('ISO_oct_19.xlsx')
+        f.to_excel('ISO_nov_19.xlsx')
+        f.to_excel('ISO_dec_19.xlsx')
+        f.to_excel('ISO_jan_20.xlsx')
+
+DATA CLEAN UP CSV
+
+import os
+import pandas as pd
+import xlrd
+
+path="D:\stock"
+
+for x in os.listdir(path):
+    if x.endswith(".csv"):
+        print(x)
+        f=pd.read_csv(rf"D:\stock\{x}")
+        
+       
+        f.columns = f.columns.str.replace(' ','_')
+        to_drop=['Product','Is_Parent','Title']
+        f.drop(to_drop, inplace=True, axis=1)
+        to_drop=['Tags','Watch_Listed','Buyer_Phone','Phone_Type','Carrier','Tracking_Number']
+        f.drop(to_drop, inplace=True, axis=1)
+        to_drop=['Gift_Wrap_Level','COD_Fee','COD_Fee_Discount','Price_Designation','Buyer_Name']
+        f.drop(to_drop,inplace=True,axis=1)
+        to_drop=['Income_Other_Fees','Refund_Commission_Fees','Refund_Shipping_Fees']
+        f.drop(to_drop,inplace=True,axis=1)
+        to_drop=['Shipping_Price','Shipping_Discount','Shipping_Tax','Phone_Validity','Buyer_Email']
+        f.drop(to_drop,inplace=True,axis=1)
+        to_drop=['Recipient','Delivery_Start_Date','Delivery_End_Date','Last_Updated_at']
+        f.drop(to_drop,inplace=True,axis=1)
+        to_drop=['Day','Date','Time','Hour','Latitude','Longitude']
+        f.drop(to_drop, inplace=True, axis=1)
+        to_drop=['Address_1','Address_2','Address_3','ZIP','City','Gift_Wrap_Message']
+        f.drop(to_drop,inplace=True,axis=1)
+        
+        
+        
+        f['Income_Commission_Fees'] = f['Income_Commission_Fees'].replace({'\$': '', ',': ''}, regex=True).astype(float)
+        f['Income_Shipping_Fees'] = f['Income_Shipping_Fees'].replace({'\$': '', ',': ''}, regex=True).astype(float)
+        f['Income_Fulfillment_Fees'] = f['Income_Fulfillment_Fees'].replace({'\$': '', ',': ''}, regex=True).astype(float)
+        f['Refund_Fulfillment_Fees'] = f['Refund_Fulfillment_Fees'].replace({'\$': '', ',': ''}, regex=True).astype(float)
+        f['Refund_Closing_Fees'] = f['Refund_Closing_Fees'].replace({'\$': '', ',': ''}, regex=True).astype(float)
+        f['Refund_Other_Fees'] = f['Refund_Other_Fees'].replace({'\$': '', ',': ''}, regex=True).astype(float)
+        f['Sales_Tax_Collected'] = f['Sales_Tax_Collected'].replace({'\$': '', ',': ''}, regex=True).astype(float)
+        f['Marketplace_Facilitator_Tax'] = f['Marketplace_Facilitator_Tax'].replace({'\$': '', ',': ''}, regex=True).astype(float)
+
+        f["Order_Date"]=pd.to_datetime(f["Order_Date"])
+        f["Order_Date"]
+        f["Order_Date"].dt.day
+        f["Order_Date"].dt.month
+        f["Order_Date"].dt.year
+        f["day"]=f["Order_Date"].dt.day
+        f["month"]=f["Order_Date"].dt.month
+        f["year"]=f["Order_Date"].dt.year
+        f.columns = map(lambda x: str(x).title(), f.columns)
+        
+        
+        f.fillna(0,inplace=True)
+      
+        
+        f.set_index('Order_Date', inplace = True)
+        f.head()
+
+        f.to_excel('ORDERS_2018.xlsx')
+        f.to_excel('ORDERS_2019.xlsx')
+        f.to_excel('ORDERS_2017.xlsx')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sub Getsheets()
+'Update ExcelJunction.com
+Path = "D:\INVENTORY STOCKOUT\"
+Filename = Dir(Path & "*.xlsx")
+Do While Filename <> ""
+Workbooks.Open Filename:=Path & Filename, ReadOnly:=True
+For Each Sheet In ActiveWorkbook.Sheets
+Sheet.Copy After:=ThisWorkbook.Sheets(1)
+Next Sheet
+Workbooks(Filename).Close
+Filename = Dir()
+Loop
+End Sub        
