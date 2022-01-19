@@ -1,0 +1,13 @@
+Sub main()
+    Dim i As Long
+
+    With ActiveSheet
+        For i = 5 To .Cells(Rows.count, 1).End(xlUp).row Step 2
+            With .Range(.Cells(i, 1).Resize(2).Address & "," & .Cells(i, 2).Resize(2).Address)
+                .Merge
+                .HorizontalAlignment = xlCenterAcrossSelection
+                .VerticalAlignment = xlCenter
+            End With
+        Next i
+    End With
+End Sub
