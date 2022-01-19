@@ -1,0 +1,341 @@
+Sub Display_stock_farthest_from_reference_price()
+
+'Dim Source As Workbook: Set Source = ActiveWorkbook
+'Workbooks.Add
+'Dim Operation As Workbook: Set Operation = ActiveWorkbook
+
+'Source.Sheets("Dividends").Copy After:=Operation.Sheets(1)
+'Source.Sheets("Reference_data").Copy After:=Operation.Sheets(1)
+'Source.Sheets("Market_price").Copy After:=Operation.Sheets(1)
+'Operation.Sheets("Sheet1").Name = "Operations"
+
+
+
+'Worksheets.Add(After:=Worksheets(3)).Name = "Operations"
+
+Dim Source As Workbook: Set Source = ActiveWorkbook
+Workbooks.Add
+Dim analysis As Workbook: Set Operation = ActiveWorkbook
+
+Source.Sheets("Dividends").Copy After:=Operation.Sheets(1)
+Source.Sheets("Reference_data").Copy After:=Operation.Sheets(1)
+Source.Sheets("Market_price").Copy After:=Operation.Sheets(1)
+Operation.Sheets("Sheet1").Name = "Operations"
+
+
+    '--> copy the tickers that have a stock price in Operations
+Dim val
+searchText = "Ticker" ' name of header
+
+
+' Delete Blank Rows if any in sheet
+'Market_price'
+Sheets("Market_price").Activate
+Dim LastRowIndex As Integer
+Dim RowIndex As Integer
+Dim UsedRng As Range
+Set UsedRng = ActiveSheet.UsedRange
+LastRowIndex = UsedRng.Row - 1 + UsedRng.Rows.Count
+Application.ScreenUpdating = False
+For RowIndex = LastRowIndex To 1 Step -1
+    If Application.CountA(Rows(RowIndex)) = 0 Then
+       Rows(RowIndex).Delete
+    End If
+Next RowIndex
+Application.ScreenUpdating = True
+
+
+
+Operation.Sheets("Market_price").Select ' origin sheet  PROBLEM HERE
+Range("A1").Select
+Range(Selection, Selection.End(xlToRight)).Select
+x = Selection.Columns.Count ' get number of columns
+
+For i = 1 To x 'iterate trough origin columns
+val = Cells(1, i).Value
+        If val = searchText Then
+            Cells(1, i).Select
+            Range(Selection, Selection.End(xlDown)).Select
+            Selection.Copy
+            Exit For
+        End If
+Next i
+
+Operation.Sheets("Market_price").Select ' destination sheet
+Range("A1").Activate          ' where to put it
+
+Operation.Sheets("Operations").Paste
+'--> Also get their price as we will need that later
+searchText = "Price" ' name of header
+
+Operation.Sheets("Market_price").Select ' origin sheet
+Range("A1").Select
+Range(Selection, Selection.End(xlToRight)).Select
+x = Selection.Columns.Count ' get number of columns
+
+For i = 1 To x 'iterate trough origin columns
+val = Cells(1, i).Value
+        If val = searchText Then
+                Cells(1, i).Select
+                Range(Selection, Selection.End(xlDown)).Select
+                Selection.Copy
+                Exit For
+        End If
+Next i
+
+Operation.Sheets("Operations").Select  ' destination sheet
+Range("B1").Select             ' where to put it
+Operation.Sheets("Operations").Paste
+'-- Done
+
+
+
+' --> ref price
+Operation.Activate
+Range("D1").Select
+ActiveCell.FormulaR1C1 = "Ref Price"
+
+'There would be a faster way of doing it if we knew the column position constantly, but we do not. So we'll paste it there first, get what we need to get and then delete
+'Copy Divident Ticker names (we created Operation from scratch so we will know what is what from the get go in Operations and where they are
+
+searchText = "Ticker" ' name of header
+
+
+' Delete Blank Rows if any in sheet
+'Dividends'
+Sheets("Dividends").Activate
+Set UsedRng = ActiveSheet.UsedRange
+LastRowIndex = UsedRng.Row - 1 + UsedRng.Rows.Count
+Application.ScreenUpdating = False
+For RowIndex = LastRowIndex To 1 Step -1
+    If Application.CountA(Rows(RowIndex)) = 0 Then
+       Rows(RowIndex).Delete
+    End If
+Next RowIndex
+Application.ScreenUpdating = True
+
+
+
+
+Operation.Sheets("Reference_data").Select ' origin sheet
+Range("A1").Select
+Range(Selection, Selection.End(xlToRight)).Select
+x = Selection.Columns.Count ' get number of columns
+
+For i = 1 To x 'iterate trough origin columns
+val = Cells(1, i).Value
+           If val = searchText Then
+                        Cells(1, i).Select
+                        Range(Selection, Selection.End(xlDown)).Select
+                        Selection.Copy
+                        Exit For
+           End If
+Next i
+
+Operation.Sheets("Operations").Select  ' destination sheet
+Range("E1").Select             ' where to put it
+Operation.Sheets("Operations").Paste
+                                
+' Done
+
+' Copy Divident Prices
+searchText = "Reference Price" ' name of header
+
+' Delete Blank Rows if any in sheet
+'Reference_data'
+Sheets("Reference_data").Activate
+
+Set UsedRng = ActiveSheet.UsedRange
+LastRowIndex = UsedRng.Row - 1 + UsedRng.Rows.Count
+Application.ScreenUpdating = False
+For RowIndex = LastRowIndex To 1 Step -1
+    If Application.CountA(Rows(RowIndex)) = 0 Then
+       Rows(RowIndex).Delete
+    End If
+Next RowIndex
+Application.ScreenUpdating = True
+
+
+Operation.Sheets("Reference_data").Select ' origin sheet
+Range("A1").Select
+Range(Selection, Selection.End(xlToRight)).Select
+x = Selection.Columns.Count ' get number of columns
+
+For i = 1 To x 'iterate trough origin columns
+val = Cells(1, i).Value
+        If val = searchText Then
+                    Cells(1, i).Select
+                    Range(Selection, Selection.End(xlDown)).Select
+                    Selection.Copy
+                    Exit For
+        End If
+Next i
+Operation.Sheets("Operations").Select  ' destination sheet
+Range("F1").Select             ' where to put it
+Operation.Sheets("Operations").Paste
+'Done
+
+ 'Get Reference Prices:
+Range("D2").Select
+ActiveCell.FormulaR1C1 = "=SUMIF(C[1],RC[-3],C[2])"
+Range("D2").Select
+    
+Dim ws As Worksheet
+Set ws = Operation.Worksheets("Operations")
+Dim usedRows As Long
+usedRows = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+Selection.AutoFill Destination:=ws.Range(Cells(2, 4), Cells(usedRows, 4)), Type:=xlFillDefault
+'Done
+                        
+'copy d in c
+ Operation.Sheets("Operations").Columns("D").Copy
+ Range("C1").Select
+Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+'Done
+
+'delete the extra sheet
+Operation.Worksheets("Operations").Columns(4).ClearContents
+Operation.Worksheets("Operations").Columns(5).ClearContents
+Operation.Worksheets("Operations").Columns(6).ClearContents
+'--Done
+        
+        
+'--> Dividends (should be the same method as ref price if the name isnt in dividend since we use sum if it would just have 0)
+'copy ticker and dividend in e and f like before (again, would be more efficient if we knew the exact location, but location is subject to change
+        
+Operation.Activate
+Range("E1").Select
+        
+ActiveCell.FormulaR1C1 = "Dividend"
+
+'Copy Divident Ticker names (we created Operation from scratch so we will know what is what from the get go in Operations and where they are
+
+searchText = "Ticker" ' name of header
+Operation.Sheets("Dividends").Select ' origin sheet
+Range("A1").Select
+Range(Selection, Selection.End(xlToRight)).Select
+x = Selection.Columns.Count ' get number of columns
+
+For i = 1 To x 'iterate trough origin columns
+val = Cells(1, i).Value
+        If val = searchText Then
+                   Cells(1, i).Select
+                   Range(Selection, Selection.End(xlDown)).Select
+                   Selection.Copy
+                   Exit For
+        End If
+Next i
+
+Operation.Sheets("Operations").Select  ' destination sheet
+Range("F1").Select             ' where to put it
+Operation.Sheets("Operations").Paste
+                                
+' Done
+' Copy Divident Prices
+
+searchText = "Dividend" ' name of header
+Operation.Sheets("Dividends").Select ' origin sheet
+Range("A1").Select
+Range(Selection, Selection.End(xlToRight)).Select
+x = Selection.Columns.Count ' get number of columns
+
+For i = 1 To x 'iterate trough origin columns
+val = Cells(1, i).Value
+        If val = searchText Then
+                Cells(1, i).Select
+                Range(Selection, Selection.End(xlDown)).Select
+                Selection.Copy
+                Exit For
+        End If
+Next i
+Operation.Sheets("Operations").Select  ' destination sheet
+Range("G1").Select             ' where to put it
+Operation.Sheets("Operations").Paste
+'Done
+
+  'Get Reference Prices:
+Range("E2").Select
+ActiveCell.FormulaR1C1 = "=SUMIF(C[1],RC[-4],C[2])"
+Range("E2").Select
+
+Selection.AutoFill Destination:=ws.Range(Cells(2, 5), Cells(usedRows, 5)), Type:=xlFillDefault
+'Done
+   
+'copy e in d
+Operation.Sheets("Operations").Columns("E").Copy
+Range("D1").Select
+Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+:=False, Transpose:=False
+'Done
+
+'delete the extra columns
+Operation.Worksheets("Operations").Columns(5).ClearContents
+Operation.Worksheets("Operations").Columns(6).ClearContents
+Operation.Worksheets("Operations").Columns(7).ClearContents
+                    
+ '-- Done
+
+'--> adjusted dividend
+Operation.Sheets("Operations").Activate
+Range("E1").Select
+ActiveCell.FormulaR1C1 = "adjusted"
+Range("E2").Select
+Application.CutCopyMode = False
+ActiveCell.FormulaR1C1 = "=RC[-2]-RC[-1]"
+Selection.AutoFill Destination:=ws.Range(Cells(2, 5), Cells(usedRows, 5)), Type:=xlFillDefault
+'-- Done
+        
+'--> diff from reference price
+Operation.Sheets("Operations").Activate
+Range("F1").Select
+ActiveCell.FormulaR1C1 = "diff(%)"
+Range("F2").Select
+ActiveCell.FormulaR1C1 = "=((RC[-4]-RC[-1])/RC[-1])*100"
+Selection.AutoFill Destination:=ws.Range(Cells(2, 6), Cells(usedRows, 6)), Type:=xlFillDefault
+'--Done
+        
+'--> find the absolute max max:
+Operation.Sheets("Operations").Activate
+Range("G1").Select
+ActiveCell.FormulaR1C1 = "diff(%)_abs"
+Range("G2").Select
+ActiveCell.FormulaR1C1 = "=abs(RC[-1])"
+Selection.AutoFill Destination:=ws.Range(Cells(2, 7), Cells(usedRows, 7)), Type:=xlFillDefault
+
+Dim max As Double
+Dim maxLocation As Integer
+
+maxLocation = 2
+max = 0
+
+For i = 2 To usedRows
+Dim current As Double
+current = Cells(i, 7).Value
+    If current > max Then
+            max = current
+            maxLocation = i
+    End If
+Next i
+
+'Range("H3").Value = maxLocation
+'--Done
+
+'--> get the info on the text box
+
+Operation.Sheets("Operations").Activate
+Dim MaxTicker As String
+MaxTicker = Cells(maxLocation, 1)
+Dim MaxDiff As Double
+MaxDiff = Cells(maxLocation, 6)
+MaxDiffFormated = Format(MaxDiff, "0.00")
+
+'remove the temporary workbook
+'Operation.Saved = "True"
+Operation.Close
+
+' "XYZ Equity is trading +/- X.XX% away from its reference price"
+MsgBox MaxTicker & " is trading " & MaxDiffFormated & "% away from its reference price"
+
+
+End Sub
